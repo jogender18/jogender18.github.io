@@ -27,6 +27,7 @@ function setupWires() {
   let pointerX = 0.5;
   let pointerY = 0.5;
   let selectedNode = null;
+  let hoveredNode = null;
   let frame;
 
   const resize = () => {
@@ -74,10 +75,13 @@ function setupWires() {
       if (!from || !to) return;
       const distance = Math.hypot(from.x - to.x, from.y - to.y);
       const selected = selectedNode === source || selectedNode === destination;
+      const hovered = hoveredNode === source || hoveredNode === destination;
       context.strokeStyle = selected
         ? 'rgba(15,118,110,.78)'
-        : `rgba(20,184,166,${Math.max(.06, .25 - distance / 900)})`;
-      context.lineWidth = selected ? 1.8 : 1;
+        : hovered
+          ? 'rgba(45,212,191,.68)'
+          : `rgba(20,184,166,${Math.max(.06, .25 - distance / 900)})`;
+      context.lineWidth = selected ? 1.8 : hovered ? 1.4 : 1;
       context.beginPath();
       context.moveTo(from.x, from.y);
       context.lineTo(to.x, to.y);
@@ -91,7 +95,9 @@ function setupWires() {
       context.fill();
     });
     projected.forEach(({ node, x, y }) => {
-      context.fillStyle = selectedNode === node ? 'rgba(15,118,110,1)' : 'rgba(15,118,110,.72)';
+      context.fillStyle = selectedNode === node || hoveredNode === node
+        ? 'rgba(15,118,110,1)'
+        : 'rgba(15,118,110,.72)';
       context.shadowColor = 'rgba(45,212,191,.55)';
       context.shadowBlur = 5;
       context.fillRect(x - 1.5, y - 1.5, 3, 3);
@@ -101,6 +107,13 @@ function setupWires() {
         context.lineWidth = 1.5;
         context.beginPath();
         context.arc(x, y, 10 + Math.sin(time * .005) * 2, 0, Math.PI * 2);
+        context.stroke();
+      }
+      if (hoveredNode === node && selectedNode !== node) {
+        context.strokeStyle = 'rgba(45,212,191,.65)';
+        context.lineWidth = 1;
+        context.beginPath();
+        context.arc(x, y, 7, 0, Math.PI * 2);
         context.stroke();
       }
       if (Math.sin(time * 0.002 + node.phase) > 0.96) {
@@ -122,10 +135,10 @@ function setupWires() {
     const touch = event.touches[0];
     if (touch) updatePointer(touch);
   }, { passive: true });
-  ambientBackground?.addEventListener('pointerdown', (event) => {
+  const findNearest = (event) => {
     const x = event.clientX;
     const y = event.clientY;
-    const nearest = nodes
+    return nodes
       .map((node) => ({
         node,
         distance: Math.hypot(
@@ -134,7 +147,23 @@ function setupWires() {
         ),
       }))
       .sort((a, b) => a.distance - b.distance)[0];
-    if (!nearest || nearest.distance > 90) return;
+  };
+  ambientBackground?.addEventListener('pointermove', (event) => {
+    const nearest = findNearest(event);
+    hoveredNode = nearest?.distance <= 90 ? nearest.node : null;
+    if (mapStatus && hoveredNode && selectedNode !== hoveredNode) {
+      mapStatus.textContent = 'Connection nearby — tap to inspect.';
+    } else if (mapStatus && !hoveredNode && !selectedNode) {
+      mapStatus.textContent = 'Tap the background map to inspect a connection.';
+    }
+  }, { passive: true });
+  ambientBackground?.addEventListener('pointerdown', (event) => {
+    const nearest = findNearest(event);
+    if (!nearest || nearest.distance > 90) {
+      selectedNode = null;
+      if (mapStatus) mapStatus.textContent = 'Tap the background map to inspect a connection.';
+      return;
+    }
     selectedNode = nearest.node;
     if (mapStatus) mapStatus.textContent = 'Connection selected — move to explore more.';
   });
