@@ -8,6 +8,7 @@ const cursorGlow = document.querySelector('.cursor-glow');
 const magneticButtons = document.querySelectorAll('.button');
 const ambientBackground = document.querySelector('.ambient-background');
 const wireCanvas = document.querySelector('.wire-canvas');
+const threeDScene = document.querySelector('.three-d-scene');
 
 function setupWires() {
   if (!wireCanvas) return;
@@ -142,10 +143,14 @@ function setupScene() {
     const bounds = heroCard.getBoundingClientRect();
     pointerX = (event.clientX - bounds.left) / bounds.width - 0.5;
     pointerY = (event.clientY - bounds.top) / bounds.height - 0.5;
+    threeDScene?.style.setProperty('--scene-y', `${pointerX * 18}deg`);
+    threeDScene?.style.setProperty('--scene-x', `${pointerY * -18}deg`);
   });
   heroCard?.addEventListener('pointerleave', () => {
     pointerX = 0;
     pointerY = 0;
+    threeDScene?.style.setProperty('--scene-x', '0deg');
+    threeDScene?.style.setProperty('--scene-y', '0deg');
   });
   resize();
   frame = requestAnimationFrame(render);
