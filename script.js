@@ -7,6 +7,73 @@ const progressBar = document.querySelector('.scroll-progress');
 const cursorGlow = document.querySelector('.cursor-glow');
 const magneticButtons = document.querySelectorAll('.button');
 const ambientBackground = document.querySelector('.ambient-background');
+const wireCanvas = document.querySelector('.wire-canvas');
+
+function setupWires() {
+  if (!wireCanvas) return;
+  const context = wireCanvas.getContext('2d');
+  if (!context) return;
+  const nodes = Array.from({ length: 34 }, (_, index) => ({
+    x: (index * 97) % 1000,
+    y: (index * 149) % 900,
+    vx: (index % 2 ? 0.08 : -0.06),
+    vy: (index % 3 ? 0.05 : -0.04),
+  }));
+  let targetX = 0.5;
+  let targetY = 0.5;
+  let pointerX = 0.5;
+  let pointerY = 0.5;
+  let frame;
+
+  const resize = () => {
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    wireCanvas.width = window.innerWidth * ratio;
+    wireCanvas.height = window.innerHeight * ratio;
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    nodes.forEach((node, index) => {
+      node.x = ((index * 97) % 1000) / 1000 * window.innerWidth;
+      node.y = ((index * 149) % 900) / 900 * window.innerHeight;
+    });
+  };
+  const render = () => {
+    pointerX += (targetX - pointerX) * 0.04;
+    pointerY += (targetY - pointerY) * 0.04;
+    context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    nodes.forEach((node) => {
+      node.x += node.vx;
+      node.y += node.vy;
+      if (node.x < -30 || node.x > window.innerWidth + 30) node.vx *= -1;
+      if (node.y < -30 || node.y > window.innerHeight + 30) node.vy *= -1;
+    });
+    nodes.forEach((node, index) => {
+      const x = node.x + (pointerX - 0.5) * 24;
+      const y = node.y + (pointerY - 0.5) * 24;
+      nodes.slice(index + 1).forEach((other) => {
+        const ox = other.x + (pointerX - 0.5) * 24;
+        const oy = other.y + (pointerY - 0.5) * 24;
+        const distance = Math.hypot(x - ox, y - oy);
+        if (distance > 155) return;
+        context.strokeStyle = `rgba(45,212,191,${(1 - distance / 155) * 0.2})`;
+        context.lineWidth = 0.7;
+        context.beginPath();
+        context.moveTo(x, y);
+        context.lineTo(ox, oy);
+        context.stroke();
+      });
+      context.fillStyle = 'rgba(45,212,191,.38)';
+      context.fillRect(x - 1.5, y - 1.5, 3, 3);
+    });
+    frame = requestAnimationFrame(render);
+  };
+  window.addEventListener('resize', resize);
+  window.addEventListener('pointermove', (event) => {
+    targetX = event.clientX / window.innerWidth;
+    targetY = event.clientY / window.innerHeight;
+  }, { passive: true });
+  resize();
+  frame = requestAnimationFrame(render);
+  window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once: true });
+}
 
 function setupScene() {
   if (!sceneCanvas) return;
@@ -78,6 +145,7 @@ function setupScene() {
 }
 
 if (!reducedMotion) {
+  setupWires();
   setupScene();
   window.addEventListener('pointermove', (event) => {
     document.documentElement.style.setProperty('--pointer-x', `${event.clientX}px`);
