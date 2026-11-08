@@ -14,11 +14,12 @@ function setupWires() {
   if (!wireCanvas) return;
   const context = wireCanvas.getContext('2d');
   if (!context) return;
-  const nodes = Array.from({ length: 34 }, (_, index) => ({
+  const nodes = Array.from({ length: 30 }, (_, index) => ({
     x: (index * 97) % 1000,
     y: (index * 149) % 900,
     vx: (index % 2 ? 0.08 : -0.06),
     vy: (index % 3 ? 0.05 : -0.04),
+    phase: index * 0.7,
   }));
   let targetX = 0.5;
   let targetY = 0.5;
@@ -36,7 +37,7 @@ function setupWires() {
       node.y = ((index * 149) % 900) / 900 * window.innerHeight;
     });
   };
-  const render = () => {
+  const render = (time) => {
     pointerX += (targetX - pointerX) * 0.04;
     pointerY += (targetY - pointerY) * 0.04;
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -46,26 +47,56 @@ function setupWires() {
       if (node.x < -30 || node.x > window.innerWidth + 30) node.vx *= -1;
       if (node.y < -30 || node.y > window.innerHeight + 30) node.vy *= -1;
     });
-    nodes.forEach((node, index) => {
-      const x = node.x + (pointerX - 0.5) * 24;
-      const y = node.y + (pointerY - 0.5) * 24;
-      nodes.slice(index + 1).forEach((other) => {
-        const ox = other.x + (pointerX - 0.5) * 24;
-        const oy = other.y + (pointerY - 0.5) * 24;
-        const distance = Math.hypot(x - ox, y - oy);
-        if (distance > 190) return;
-        context.strokeStyle = `rgba(20,184,166,${(1 - distance / 190) * 0.34})`;
-        context.lineWidth = 1;
-        context.beginPath();
-        context.moveTo(x, y);
-        context.lineTo(ox, oy);
-        context.stroke();
+    const projected = nodes.map((node) => ({
+      node,
+      x: node.x + (pointerX - 0.5) * 24,
+      y: node.y + (pointerY - 0.5) * 24,
+    }));
+    const links = [];
+    projected.forEach((point, index) => {
+      const nearest = projected
+        .filter((candidate, candidateIndex) => candidateIndex !== index)
+        .sort((a, b) => Math.hypot(point.x - a.x, point.y - a.y)
+          - Math.hypot(point.x - b.x, point.y - b.y))
+        .slice(0, 2);
+      nearest.forEach((other) => {
+        const key = [point.node, other.node].sort((a, b) => a.phase - b.phase);
+        if (!links.some((link) => link[0] === key[0] && link[1] === key[1])) {
+          links.push(key);
+        }
       });
+    });
+    links.forEach(([source, destination], index) => {
+      const from = projected.find((point) => point.node === source);
+      const to = projected.find((point) => point.node === destination);
+      if (!from || !to) return;
+      const distance = Math.hypot(from.x - to.x, from.y - to.y);
+      context.strokeStyle = `rgba(20,184,166,${Math.max(.06, .25 - distance / 900)})`;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(from.x, from.y);
+      context.lineTo(to.x, to.y);
+      context.stroke();
+      const progress = ((time * 0.00012 + index * 0.13) % 1);
+      const packetX = from.x + (to.x - from.x) * progress;
+      const packetY = from.y + (to.y - from.y) * progress;
+      context.fillStyle = 'rgba(45,212,191,.9)';
+      context.beginPath();
+      context.arc(packetX, packetY, 2, 0, Math.PI * 2);
+      context.fill();
+    });
+    projected.forEach(({ node, x, y }) => {
       context.fillStyle = 'rgba(15,118,110,.72)';
       context.shadowColor = 'rgba(45,212,191,.55)';
       context.shadowBlur = 5;
       context.fillRect(x - 1.5, y - 1.5, 3, 3);
       context.shadowBlur = 0;
+      if (Math.sin(time * 0.002 + node.phase) > 0.96) {
+        context.strokeStyle = 'rgba(45,212,191,.45)';
+        context.beginPath();
+        context.arc(x, y, 7, 0, Math.PI * 2);
+        context.stroke();
+      }
     });
     frame = requestAnimationFrame(render);
   };
