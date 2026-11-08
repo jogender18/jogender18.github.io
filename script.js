@@ -52,23 +52,31 @@ function setupWires() {
         const ox = other.x + (pointerX - 0.5) * 24;
         const oy = other.y + (pointerY - 0.5) * 24;
         const distance = Math.hypot(x - ox, y - oy);
-        if (distance > 155) return;
-        context.strokeStyle = `rgba(45,212,191,${(1 - distance / 155) * 0.2})`;
-        context.lineWidth = 0.7;
+        if (distance > 190) return;
+        context.strokeStyle = `rgba(20,184,166,${(1 - distance / 190) * 0.34})`;
+        context.lineWidth = 1;
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(ox, oy);
         context.stroke();
       });
-      context.fillStyle = 'rgba(45,212,191,.38)';
+      context.fillStyle = 'rgba(15,118,110,.72)';
+      context.shadowColor = 'rgba(45,212,191,.55)';
+      context.shadowBlur = 5;
       context.fillRect(x - 1.5, y - 1.5, 3, 3);
+      context.shadowBlur = 0;
     });
     frame = requestAnimationFrame(render);
   };
   window.addEventListener('resize', resize);
-  window.addEventListener('pointermove', (event) => {
+  const updatePointer = (event) => {
     targetX = event.clientX / window.innerWidth;
     targetY = event.clientY / window.innerHeight;
+  };
+  window.addEventListener('pointermove', updatePointer, { passive: true });
+  window.addEventListener('touchmove', (event) => {
+    const touch = event.touches[0];
+    if (touch) updatePointer(touch);
   }, { passive: true });
   resize();
   frame = requestAnimationFrame(render);
@@ -144,8 +152,9 @@ function setupScene() {
   window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once: true });
 }
 
+setupWires();
+
 if (!reducedMotion) {
-  setupWires();
   setupScene();
   window.addEventListener('pointermove', (event) => {
     document.documentElement.style.setProperty('--pointer-x', `${event.clientX}px`);
