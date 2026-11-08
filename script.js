@@ -12,8 +12,8 @@ function setupScene() {
   if (!sceneCanvas) return;
   const context = sceneCanvas.getContext('2d');
   if (!context) return;
-  const points = Array.from({ length: 42 }, (_, index) => ({
-    angle: (index / 42) * Math.PI * 2,
+  const points = Array.from({ length: 30 }, (_, index) => ({
+    angle: (index / 30) * Math.PI * 2,
     radius: 48 + (index % 5) * 11,
     depth: (index % 7) / 7,
     speed: 0.00025 + (index % 4) * 0.00008,
@@ -45,14 +45,16 @@ function setupScene() {
       };
     });
     projected.forEach((point, index) => {
-      const next = projected[(index + 1) % projected.length];
-      context.strokeStyle = `rgba(216,243,106,${0.08 + point.depth * 0.14})`;
-      context.lineWidth = 0.7;
-      context.beginPath();
-      context.moveTo(point.x, point.y);
-      context.lineTo(next.x, next.y);
-      context.stroke();
-      context.fillStyle = `rgba(216,243,106,${0.38 + point.depth * 0.6})`;
+      if (index % 2 === 0) {
+        const next = projected[(index + 1) % projected.length];
+        context.strokeStyle = `rgba(255,209,102,${0.06 + point.depth * 0.1})`;
+        context.lineWidth = 0.6;
+        context.beginPath();
+        context.moveTo(point.x, point.y);
+        context.lineTo(next.x, next.y);
+        context.stroke();
+      }
+      context.fillStyle = `rgba(255,209,102,${0.3 + point.depth * 0.55})`;
       context.beginPath();
       context.arc(point.x, point.y, point.size, 0, Math.PI * 2);
       context.fill();
