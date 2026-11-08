@@ -6,6 +6,7 @@ const navLinks = [...document.querySelectorAll('.nav-links a[href^="#"]')];
 const progressBar = document.querySelector('.scroll-progress');
 const cursorGlow = document.querySelector('.cursor-glow');
 const magneticButtons = document.querySelectorAll('.button');
+const ambientBackground = document.querySelector('.ambient-background');
 
 function setupScene() {
   if (!sceneCanvas) return;
@@ -79,6 +80,12 @@ if (!reducedMotion) {
   window.addEventListener('pointermove', (event) => {
     document.documentElement.style.setProperty('--pointer-x', `${event.clientX}px`);
     document.documentElement.style.setProperty('--pointer-y', `${event.clientY}px`);
+    if (ambientBackground) {
+      const x = (event.clientX / window.innerWidth - 0.5) * 70;
+      const y = (event.clientY / window.innerHeight - 0.5) * 70;
+      ambientBackground.style.setProperty('--bg-x', `${x}px`);
+      ambientBackground.style.setProperty('--bg-y', `${y}px`);
+    }
     if (cursorGlow) {
       cursorGlow.style.left = `${event.clientX}px`;
       cursorGlow.style.top = `${event.clientY}px`;
