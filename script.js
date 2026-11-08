@@ -9,6 +9,7 @@ const magneticButtons = document.querySelectorAll('.button');
 const ambientBackground = document.querySelector('.ambient-background');
 const wireCanvas = document.querySelector('.wire-canvas');
 const threeDScene = document.querySelector('.three-d-scene');
+const mapStatus = document.querySelector('.map-status');
 
 function setupWires() {
   if (!wireCanvas) return;
@@ -25,6 +26,7 @@ function setupWires() {
   let targetY = 0.5;
   let pointerX = 0.5;
   let pointerY = 0.5;
+  let selectedNode = null;
   let frame;
 
   const resize = () => {
@@ -71,8 +73,11 @@ function setupWires() {
       const to = projected.find((point) => point.node === destination);
       if (!from || !to) return;
       const distance = Math.hypot(from.x - to.x, from.y - to.y);
-      context.strokeStyle = `rgba(20,184,166,${Math.max(.06, .25 - distance / 900)})`;
-      context.lineWidth = 1;
+      const selected = selectedNode === source || selectedNode === destination;
+      context.strokeStyle = selected
+        ? 'rgba(15,118,110,.78)'
+        : `rgba(20,184,166,${Math.max(.06, .25 - distance / 900)})`;
+      context.lineWidth = selected ? 1.8 : 1;
       context.beginPath();
       context.moveTo(from.x, from.y);
       context.lineTo(to.x, to.y);
@@ -86,11 +91,18 @@ function setupWires() {
       context.fill();
     });
     projected.forEach(({ node, x, y }) => {
-      context.fillStyle = 'rgba(15,118,110,.72)';
+      context.fillStyle = selectedNode === node ? 'rgba(15,118,110,1)' : 'rgba(15,118,110,.72)';
       context.shadowColor = 'rgba(45,212,191,.55)';
       context.shadowBlur = 5;
       context.fillRect(x - 1.5, y - 1.5, 3, 3);
       context.shadowBlur = 0;
+      if (selectedNode === node) {
+        context.strokeStyle = 'rgba(45,212,191,.9)';
+        context.lineWidth = 1.5;
+        context.beginPath();
+        context.arc(x, y, 10 + Math.sin(time * .005) * 2, 0, Math.PI * 2);
+        context.stroke();
+      }
       if (Math.sin(time * 0.002 + node.phase) > 0.96) {
         context.strokeStyle = 'rgba(45,212,191,.45)';
         context.beginPath();
@@ -110,6 +122,22 @@ function setupWires() {
     const touch = event.touches[0];
     if (touch) updatePointer(touch);
   }, { passive: true });
+  ambientBackground?.addEventListener('pointerdown', (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    const nearest = nodes
+      .map((node) => ({
+        node,
+        distance: Math.hypot(
+          node.x + (pointerX - 0.5) * 24 - x,
+          node.y + (pointerY - 0.5) * 24 - y,
+        ),
+      }))
+      .sort((a, b) => a.distance - b.distance)[0];
+    if (!nearest || nearest.distance > 90) return;
+    selectedNode = nearest.node;
+    if (mapStatus) mapStatus.textContent = 'Connection selected — move to explore more.';
+  });
   resize();
   frame = requestAnimationFrame(render);
   window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once: true });
