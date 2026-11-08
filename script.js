@@ -3,6 +3,9 @@ const heroCard = document.querySelector('.hero-card');
 const sceneCanvas = document.querySelector('.scene-canvas');
 const projects = document.querySelectorAll('.project');
 const navLinks = [...document.querySelectorAll('.nav-links a[href^="#"]')];
+const progressBar = document.querySelector('.scroll-progress');
+const cursorGlow = document.querySelector('.cursor-glow');
+const magneticButtons = document.querySelectorAll('.button');
 
 function setupScene() {
   if (!sceneCanvas) return;
@@ -73,6 +76,34 @@ function setupScene() {
 
 if (!reducedMotion) {
   setupScene();
+  window.addEventListener('pointermove', (event) => {
+    document.documentElement.style.setProperty('--pointer-x', `${event.clientX}px`);
+    document.documentElement.style.setProperty('--pointer-y', `${event.clientY}px`);
+    if (cursorGlow) {
+      cursorGlow.style.left = `${event.clientX}px`;
+      cursorGlow.style.top = `${event.clientY}px`;
+    }
+  }, { passive: true });
+
+  magneticButtons.forEach((button) => {
+    button.addEventListener('pointermove', (event) => {
+      const bounds = button.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+      const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+      button.style.setProperty('--mag-x', `${x * 7}px`);
+      button.style.setProperty('--mag-y', `${y * 5}px`);
+    });
+    button.addEventListener('pointerleave', () => {
+      button.style.setProperty('--mag-x', '0px');
+      button.style.setProperty('--mag-y', '0px');
+    });
+  });
+
+  window.addEventListener('scroll', () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    if (progressBar && scrollable > 0) progressBar.style.transform = `scaleX(${window.scrollY / scrollable})`;
+  }, { passive: true });
+
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
