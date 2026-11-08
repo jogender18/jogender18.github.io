@@ -47,14 +47,14 @@ function setupScene() {
     projected.forEach((point, index) => {
       if (index % 2 === 0) {
         const next = projected[(index + 1) % projected.length];
-        context.strokeStyle = `rgba(255,209,102,${0.06 + point.depth * 0.1})`;
+        context.strokeStyle = `rgba(99,230,190,${0.06 + point.depth * 0.1})`;
         context.lineWidth = 0.6;
         context.beginPath();
         context.moveTo(point.x, point.y);
         context.lineTo(next.x, next.y);
         context.stroke();
       }
-      context.fillStyle = `rgba(255,209,102,${0.3 + point.depth * 0.55})`;
+      context.fillStyle = `rgba(200,255,106,${0.3 + point.depth * 0.55})`;
       context.beginPath();
       context.arc(point.x, point.y, point.size, 0, Math.PI * 2);
       context.fill();
