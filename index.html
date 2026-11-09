@@ -10,6 +10,7 @@
   <script src="script.js" defer></script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <div class="ambient-background" aria-hidden="true">
     <canvas class="wire-canvas" tabindex="0" aria-label="Interactive connection map"></canvas>
     <span class="ambient-blob blob-coral"></span>
@@ -21,7 +22,8 @@
   <header class="site-header">
     <nav class="nav container" aria-label="Main navigation">
       <a class="brand" href="#top">JK<span>.</span></a>
-      <div class="nav-links">
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-links">Menu</button>
+      <div class="nav-links" id="primary-links">
         <a href="#work">Work</a>
         <a href="#about">About</a>
         <a href="#stack">Stack</a>
@@ -31,7 +33,7 @@
     </nav>
   </header>
 
-  <main id="top">
+  <main id="top" tabindex="-1">
     <section class="hero container reveal">
       <div class="hero-copy">
         <p class="eyebrow"><span class="live-dot"></span> HELLO, I'M JOGENDER</p>
@@ -75,8 +77,8 @@
     <section id="work" class="work container section reveal">
       <div class="section-heading"><div><p class="eyebrow">THINGS I’VE BUILT <span class="section-index">/ 02</span></p><h2>A few experiments that became real.</h2></div><p>Not everything starts with a plan. These did start with curiosity.</p></div>
       <div class="project-grid">
-        <article class="project featured" style="--delay:0ms"><div class="project-art art-orbit"><span></span><i></i></div><div class="project-top"><span class="project-number">01</span><span class="project-type">AI / BACKEND</span></div><h3>Chinntu</h3><p>I’m exploring how an AI assistant should be put together: small, reusable pieces instead of one giant black box.</p><div class="tags"><span>Python</span><span>AI</span><span>Open source</span></div><a class="project-link" href="https://github.com/jogender18/Chinntu" target="_blank" rel="noreferrer">Look at the code <span>↗</span></a></article>
-        <article class="project" style="--delay:100ms"><div class="project-art art-document"><span>VOICE</span><span>PDF</span><span>QR</span></div><div class="project-top"><span class="project-number">02</span><span class="project-type">VOICE / DOCUMENTS</span></div><h3>Sahayak</h3><p>A practical tool for creating wage agreements with voice input, PDF export, and QR verification.</p><div class="tags"><span>Python</span><span>Voice</span><span>PDF</span></div><a class="project-link" href="https://github.com/jogender18/sahayak" target="_blank" rel="noreferrer">Look at the code <span>↗</span></a></article>
+        <article class="project featured" style="--delay:0ms"><div class="project-art art-orbit"><span></span><i></i></div><div class="project-top"><span class="project-number">01</span><span class="project-type">AI / BACKEND</span></div><h3>Chinntu</h3><p>I’m exploring how an AI assistant should be put together: small, reusable pieces instead of one giant black box.</p><div class="project-result">Focus: modular AI architecture</div><div class="tags"><span>Python</span><span>AI</span><span>Open source</span></div><a class="project-link" href="https://github.com/jogender18/Chinntu" target="_blank" rel="noreferrer">Look at the code <span>↗</span></a></article>
+        <article class="project" style="--delay:100ms"><div class="project-art art-document"><span>VOICE</span><span>PDF</span><span>QR</span></div><div class="project-top"><span class="project-number">02</span><span class="project-type">VOICE / DOCUMENTS</span></div><h3>Sahayak</h3><p>A practical tool for creating wage agreements with voice input, PDF export, and QR verification.</p><div class="project-result">Outcome: simpler document workflows</div><div class="tags"><span>Python</span><span>Voice</span><span>PDF</span></div><a class="project-link" href="https://github.com/jogender18/sahayak" target="_blank" rel="noreferrer">Look at the code <span>↗</span></a></article>
         <article class="project project-note" style="--delay:200ms"><div class="project-top"><span class="project-number">03</span><span class="project-type">NEXT</span></div><h3>Still figuring it out<span class="accent">.</span></h3><p>I keep a running list of ideas and learn by turning the interesting ones into small working prototypes.</p><a class="project-link" href="https://github.com/jogender18?tab=repositories" target="_blank" rel="noreferrer">See everything on GitHub <span>↗</span></a></article>
       </div>
       <div class="principles" aria-label="Design principles">

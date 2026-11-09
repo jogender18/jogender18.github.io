@@ -10,6 +10,22 @@ const ambientBackground = document.querySelector('.ambient-background');
 const wireCanvas = document.querySelector('.wire-canvas');
 const threeDScene = document.querySelector('.three-d-scene');
 const mapStatus = document.querySelector('.map-status');
+const menuToggle = document.querySelector('.menu-toggle');
+const primaryLinks = document.querySelector('.nav-links');
+
+menuToggle?.addEventListener('click', () => {
+  const isOpen = primaryLinks?.classList.toggle('is-open') ?? false;
+  menuToggle.setAttribute('aria-expanded', String(isOpen));
+  menuToggle.textContent = isOpen ? 'Close' : 'Menu';
+});
+
+primaryLinks?.querySelectorAll('a').forEach((link) => {
+  link.addEventListener('click', () => {
+    primaryLinks.classList.remove('is-open');
+    menuToggle?.setAttribute('aria-expanded', 'false');
+    if (menuToggle) menuToggle.textContent = 'Menu';
+  });
+});
 
 function setupWires() {
   if (!wireCanvas) return;

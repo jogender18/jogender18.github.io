@@ -24,6 +24,19 @@ body {
 }
 a { color: inherit; }
 .container { width: min(var(--max), calc(100% - 48px)); margin-inline: auto; }
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 30;
+  padding: 8px 12px;
+  background: var(--mint);
+  color: #07130f;
+  font-size: .75rem;
+  font-weight: 800;
+  transform: translateY(-140%);
+}
+.skip-link:focus { transform: translateY(0); }
 
 .ambient-background {
   position: fixed;
@@ -75,6 +88,7 @@ a { color: inherit; }
 }
 .nav-links a:hover, .nav-links a.is-active, .footer a:hover { color: var(--mint); }
 .nav-links a.is-active::before { content: '• '; color: var(--coral); }
+.menu-toggle { display: none; }
 
 .hero {
   min-height: 640px;
@@ -268,6 +282,12 @@ a { color: inherit; }
 .art-document span:nth-child(2) { border-color: var(--coral); background: var(--coral); color: #1b1015; transform: rotate(5deg); }
 .project h3 { margin: 26px 0 11px; font-size: 1.55rem; letter-spacing: -.06em; }
 .project p { margin: 0 0 20px; color: var(--muted); font-size: .86rem; }
+.project-result {
+  margin: 0 0 18px;
+  color: #a4b9b2;
+  font: 500 .63rem 'DM Mono', monospace;
+}
+.featured .project-result { color: var(--mint); }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .tags span { padding: 4px 7px; border: 1px solid #30404e; color: #8797a6; font: 500 .61rem 'DM Mono', monospace; }
 .featured .tags span { border-color: #316052; color: #9fe2cb; }
@@ -313,9 +333,27 @@ a { color: inherit; }
 @media (max-width: 620px) {
   .container, .open-source-strip { width: min(100% - 32px, var(--max)); }
   .nav { height: 64px; }
-  .nav-links { gap: 12px; }
-  .nav-links a { font-size: .62rem; }
-  .nav-links a:nth-child(3), .nav-links a:nth-child(4) { display: none; }
+  .menu-toggle {
+    display: block;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--ink);
+    font: 500 .62rem 'DM Mono', monospace;
+  }
+  .nav-links {
+    position: absolute;
+    top: 64px;
+    right: 16px;
+    left: 16px;
+    display: none;
+    padding: 8px;
+    border: 1px solid var(--line);
+    background: rgba(16, 24, 34, .98);
+  }
+  .nav-links.is-open { display: grid; gap: 0; }
+  .nav-links a { padding: 12px; font-size: .68rem; }
   .hero { padding: 72px 0 86px; }
   .hero h1 { font-size: 3.35rem; }
   .hero-card { height: 350px; }
