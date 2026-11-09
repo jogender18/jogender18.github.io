@@ -261,7 +261,7 @@ function setupScene() {
   window.addEventListener('pagehide', () => cancelAnimationFrame(frame), { once: true });
 }
 
-setupWires();
+if (!reducedMotion) setupWires();
 
 if (!reducedMotion) {
   setupScene();
