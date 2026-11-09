@@ -191,6 +191,24 @@ a { color: inherit; }
   transform-style: preserve-3d;
   transition: transform .35s cubic-bezier(.2, .8, .2, 1);
 }
+.scene-depth {
+  position: absolute;
+  inset: 30px;
+  border: 1px solid rgba(101, 230, 190, .16);
+  border-radius: 50%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.depth-back {
+  inset: 8px 34px 62px;
+  border-color: rgba(156, 140, 255, .18);
+  transform: translateZ(-42px) rotateX(68deg);
+}
+.depth-front {
+  inset: 58px 20px 12px;
+  border-color: rgba(255, 123, 143, .2);
+  transform: translateZ(52px) rotateY(68deg);
+}
 .three-d-orbit {
   position: absolute;
   inset: 16px;
