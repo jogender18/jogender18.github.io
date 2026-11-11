@@ -12,11 +12,26 @@ const threeDScene = document.querySelector('.three-d-scene');
 const mapStatus = document.querySelector('.map-status');
 const menuToggle = document.querySelector('.menu-toggle');
 const primaryLinks = document.querySelector('.nav-links');
+const siteHeader = document.querySelector('.site-header');
+
+const updateHeader = () => {
+  siteHeader?.classList.toggle('is-scrolled', window.scrollY > 12);
+};
+updateHeader();
+window.addEventListener('scroll', updateHeader, { passive: true });
 
 menuToggle?.addEventListener('click', () => {
   const isOpen = primaryLinks?.classList.toggle('is-open') ?? false;
   menuToggle.setAttribute('aria-expanded', String(isOpen));
   menuToggle.textContent = isOpen ? 'Close' : 'Menu';
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || !primaryLinks?.classList.contains('is-open')) return;
+  primaryLinks.classList.remove('is-open');
+  menuToggle?.setAttribute('aria-expanded', 'false');
+  if (menuToggle) menuToggle.textContent = 'Menu';
+  menuToggle?.focus();
 });
 
 primaryLinks?.querySelectorAll('a').forEach((link) => {
@@ -347,6 +362,13 @@ const sectionObserver = new IntersectionObserver((entries) => {
       'is-active',
       link.getAttribute('href') === `#${entry.target.id}`,
     ));
+    navLinks.forEach((link) => {
+      if (link.getAttribute('href') === `#${entry.target.id}`) {
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
   });
 }, { rootMargin: '-35% 0px -55% 0px' });
 
